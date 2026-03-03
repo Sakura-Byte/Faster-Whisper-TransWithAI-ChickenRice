@@ -1,0 +1,39 @@
+services:
+  chickenrice-webapi-rocm:
+    build:
+      context: .
+      dockerfile: Dockerfile.webapi.rocm
+      args:
+        # Optional: override with HIP-enabled ctranslate2 wheel URL
+        CTRANSLATE2_WHEEL_URL: ${CTRANSLATE2_WHEEL_URL:-}
+    container_name: chickenrice-webapi-rocm
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Set this to protect all API endpoints. If empty, API is open.
+      CHICKENRICE_API_TOKEN: "change-me"
+      CHICKENRICE_API_HOST: "0.0.0.0"
+      CHICKENRICE_API_PORT: "8000"
+      CHICKENRICE_MODEL_PATH: "/app/models"
+      CHICKENRICE_GENERATION_CONFIG: "/app/generation_config.json5"
+      CHICKENRICE_JOB_WORKERS: "1"
+      CHICKENRICE_DOWNLOAD_TIMEOUT_SECONDS: "600"
+      # HIP backend still uses the public device name "cuda".
+      HIP_VISIBLE_DEVICES: ${HIP_VISIBLE_DEVICES:-0}
+      # Optional for some cards/drivers. Example: 11.0.0 for gfx110x
+      HSA_OVERRIDE_GFX_VERSION: ${HSA_OVERRIDE_GFX_VERSION:-}
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    group_add:
+      # Override by exporting VIDEO_GID/RENDER_GID on host when needed.
+      - "${VIDEO_GID:-44}"
+      - "${RENDER_GID:-109}"
+    security_opt:
+      - seccomp=unconfined
+    ipc: host
+    shm_size: "8gb"
+    volumes:
+      - ./models:/app/models
+      - ./generation_config.json5:/app/generation_config.json5:ro

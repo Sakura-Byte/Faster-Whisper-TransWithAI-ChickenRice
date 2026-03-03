@@ -172,6 +172,26 @@ docker compose -f docker-compose.webapi.yml up -d --build
 
 `docker-compose.webapi.yml` 已包含 `gpus: all` 示例，模型目录通过 `./models:/app/models` 挂载。
 
+### Docker（HIP/ROCm）启动
+
+```bash
+# 1) 可选：指定 HIP 版 ctranslate2 wheel（按你的环境填写）
+export CTRANSLATE2_WHEEL_URL='https://.../ctranslate2-hip.whl'
+
+# 2) 启动 ROCm 版本 WebAPI
+docker compose -f docker-compose.webapi.rocm.yml up -d --build
+```
+
+已提供：
+- `Dockerfile.webapi.rocm`
+- `docker-compose.webapi.rocm.yml`
+
+说明：
+- 该 compose 会挂载 `/dev/kfd` 与 `/dev/dri`，并设置 `group_add`（可通过 `VIDEO_GID` / `RENDER_GID` 覆盖）。
+- HIP 后端仍沿用 CTranslate2 的公开设备名 `cuda`（与 v1.7 AMD 约定一致）。
+- 如需特定架构兼容（如 `gfx110x`），可按需设置 `HSA_OVERRIDE_GFX_VERSION`。
+- 模型目录仍通过 `./models:/app/models` 挂载。
+
 ### API 约定
 
 - `GET /healthz`
