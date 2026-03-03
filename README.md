@@ -135,6 +135,56 @@ Usage is the same as NVIDIA builds — just run `运行(GPU).bat` (internally us
 运行(翻译视频)(GPU).bat
 ```
 
+## 🌐 WebAPI 模式（供 Hibiki 调用）
+
+支持将 ChickenRice 作为独立 WebAPI 服务运行，Hibiki 通过 `download_url + download_headers` 直接让 ChickenRice 拉取音频源，不经过上传中转。
+
+### 本地启动
+
+```bash
+# 1) 安装依赖（建议在已有 conda 环境中）
+pip install -r requirements-webapi.txt
+
+# 2) 设置可选鉴权 Token（为空则不鉴权）
+export CHICKENRICE_API_TOKEN='your-token'
+
+# 3) 启动服务
+python webapi.py
+```
+
+默认监听：`0.0.0.0:8000`。  
+可用环境变量：
+- `CHICKENRICE_API_HOST`（默认 `0.0.0.0`）
+- `CHICKENRICE_API_PORT`（默认 `8000`）
+- `CHICKENRICE_MODEL_PATH`（默认 `models`）
+- `CHICKENRICE_GENERATION_CONFIG`（默认 `generation_config.json5`）
+- `CHICKENRICE_JOB_WORKERS`（默认 `1`，建议先保持 1）
+
+### Docker（CUDA）启动
+
+```bash
+docker compose -f docker-compose.webapi.yml up -d --build
+```
+
+已提供：
+- `Dockerfile.webapi.cuda`
+- `docker-compose.webapi.yml`
+
+`docker-compose.webapi.yml` 已包含 `gpus: all` 示例，模型目录通过 `./models:/app/models` 挂载。
+
+### API 约定
+
+- `GET /healthz`
+- `POST /v1/transcribe`（同步）
+- `POST /v1/jobs/transcribe`（异步创建，返回 `job_id`）
+- `GET /v1/jobs/{job_id}`（返回 `status/stage/progress_pct/message/result`）
+
+Hibiki 当前使用异步任务接口。鉴权使用：
+
+```http
+Authorization: Bearer <token>
+```
+
 ## ☁️ Modal 云端推理 / Cloud Inference
 
 无本地 GPU 或显存不足？使用 Modal 云端 GPU 进行推理：

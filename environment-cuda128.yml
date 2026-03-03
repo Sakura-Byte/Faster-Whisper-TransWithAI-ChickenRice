@@ -32,6 +32,8 @@ dependencies:
       - pyjson5>=1.6.0
       - markupsafe==2.1.5
       - backports.functools-lru-cache  # Fix for PyInstaller ModuleNotFoundError
+      - fastapi>=0.115.0
+      - uvicorn[standard]>=0.30.0
 
       # Build tools
       - pyinstaller>=6.0.0

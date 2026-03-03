@@ -1,0 +1,11 @@
+# WebAPI runtime dependencies
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+requests>=2.31.0
+
+# Core inference dependencies
+pyjson5>=1.6.0
+faster-whisper>=1.0.0
+ctranslate2>=4.5.0
+transformers>=4.30.0
+librosa>=0.10.0

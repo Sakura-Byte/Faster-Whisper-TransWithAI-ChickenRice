@@ -1,0 +1,24 @@
+services:
+  chickenrice-webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.webapi.cuda
+    container_name: chickenrice-webapi
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Set this to protect all API endpoints. If empty, API is open.
+      CHICKENRICE_API_TOKEN: "change-me"
+      CHICKENRICE_API_HOST: "0.0.0.0"
+      CHICKENRICE_API_PORT: "8000"
+      CHICKENRICE_MODEL_PATH: "/app/models"
+      CHICKENRICE_GENERATION_CONFIG: "/app/generation_config.json5"
+      # The VAD injection path is process-global; keep one worker unless tested otherwise.
+      CHICKENRICE_JOB_WORKERS: "1"
+      CHICKENRICE_DOWNLOAD_TIMEOUT_SECONDS: "600"
+    volumes:
+      - ./models:/app/models
+      - ./generation_config.json5:/app/generation_config.json5:ro
+    # Compose v2 GPU syntax
+    gpus: all
